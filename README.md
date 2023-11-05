@@ -18,23 +18,23 @@ pip3 install pyserial
 - Mellow SB2040
 
 
-## CanBoot
+## Katapult
 
 ### Cloning repo
 
 ```
 sudo su pi
 cd ~
-git clone https://github.com/Arksine/CanBoot
+git clone https://github.com/Arksine/katapult
 ```
 
 ### Create images
 
-#### CanBoot for octopus 1.1
+#### Katapult for octopus 1.1
 
 We will configure the firmware
 ```
-cd ~/CanBoot
+cd ~/katapult
 make menuconfig
 ```
 ![coonboot firmware](images/octopus_canboot_firmware_config.png)
@@ -48,13 +48,13 @@ make
 
 ```
 mkdir ~/firmware
-mv ~/CanBoot/out/canboot.bin ~/firmware/octopus_1.1_canboot.bin
+mv ~/katapult/out/katapult.bin ~/firmware/octopus_1.1_katapult.bin
 ```
 
 
 ### Flashing images
 
-#### CanBoot for octopus 1.1
+#### Katapult for octopus 1.1
 
 Set your octopus 1.1 board to DFU. To do that, remove the blue jumper and put it on the purple jumper (blue is power over usb and purple is boot mode).
 ![octopus 1.1 dfu mode](images/octopus_1.1_to_dfu.png)
@@ -76,17 +76,17 @@ dfu-util -l
 >
 > Note the address of the usb device => 0483:df11
 
-We will now procede to flash the bootloader of the board to canboot
+We will now procede to flash the bootloader of the board to katapult
 
 ```
-sudo dfu-util -a 0 -D ~/firmware/octopus_1.1_canboot.bin --dfuse-address 0x08000000:force:mass-erase:leave -d 0483:df11
+sudo dfu-util -a 0 -D ~/firmware/octopus_1.1_katapult.bin --dfuse-address 0x08000000:force:mass-erase:leave -d 0483:df11
 ```
 
-The board should now be flash with a canboot bootloader.
+The board should now be flash with a katapult bootloader.
 
 **/!\\/!\\/!\\  You can now remove the purple jumper. /!\\/!\\/!\\**
 
-#### CanBoot for sb2040
+#### Katapult for sb2040
 
 Set your sb2040 board to DFU. To do that, remove any power to the board, press the boot button while connecting the board to USB.
 The board should now be in DFU.
@@ -98,7 +98,7 @@ To confirm that you can simple do a `lsusb`
 
 We will configure the firmware
 ```
-cd ~/CanBoot
+cd ~/katapult
 make menuconfig
 ```
 ![coonboot firmware](images/sb2040_canboot_firmware_config.png)
@@ -182,9 +182,9 @@ ls -al /dev/serial/by-id
 > Note the serial of the octopus 1.1 board
 
 ```
-cd ~/CanBoot/scripts
+cd ~/katapult/scripts
 pip3 install pyserial
-python3 flash_can.py -f ~/firmware/octopus_1.1_klipper.bin -d /dev/serial/by-id/usb-CanBoot_stm32f446xx_170038000650314D35323820-if00
+python3 flash_can.py -f ~/firmware/octopus_1.1_klipper.bin -d /dev/serial/by-id/usb-katapult_stm32f446xx_170038000650314D35323820-if00
 ```
 
 The board should now be flash with a klipper can bridge.
@@ -225,12 +225,12 @@ TX: bytes  packets  errors  dropped carrier collsns
 #### Klipper for sb2040
 
 ```
-cd ~/CanBoot/scripts
+cd ~/katapult/scripts
 python3 flash_can.py -i can0 -q
 ```
 ```
 Resetting all bootloader node IDs...
-Checking for canboot nodes...
+Checking for katapult nodes...
 Detected UUID: c2ecdf459ba5, Application: Klipper
 Detected UUID: 685d07717632, Application: Klipper
 Query Complete
@@ -252,12 +252,12 @@ The board should now be flash with a klipper can.
 ### Retrieve serial UUID of can device
 
 ```
-cd ~/CanBoot/scripts
+cd ~/katapult/scripts
 python3 flash_can.py -i can0 -q
 ```
 ```
 Resetting all bootloader node IDs...
-Checking for canboot nodes...
+Checking for katapult nodes...
 Detected UUID: c2ecdf459ba5, Application: Klipper
 Detected UUID: 685d07717632, Application: Klipper
 Query Complete
@@ -309,7 +309,7 @@ candump -d -e can0 -H -t a
 
 > List CAN devices
 ```
-cd ~/CanBoot/scripts
+cd ~/katapult/scripts
 python3 flash_can.py -i can0 -q
 ```
 
@@ -320,7 +320,7 @@ python3 flash_can.py -i can0 -u d0548cb2fa73 -f ~/firmware/octopus_1.1_klipper.b
 
 > Flash over serial usb
 ```
-python3 flash_can.py -d /dev/serial/by-id/usb-CanBoot_stm32f446xx_4A0021000651303431333234-if00 -f ~/firmware/octopus_1.1_klipper.bin
+python3 flash_can.py -d /dev/serial/by-id/usb-katapult_stm32f446xx_4A0021000651303431333234-if00 -f ~/firmware/octopus_1.1_klipper.bin
 ```
 
 > can0 interface information
@@ -356,11 +356,11 @@ systemctl stop klipper
 
 > If you manage to kill fast enough klipper, you should been able to see the CAN device.
 ```
-cd ~/CanBoot/scripts
+cd ~/katapult/scripts
 python3 flash_can.py -i can0 -q
 ```
 
-> Trigger the board to restart on canboot bootloader
+> Trigger the board to restart on katapult bootloader
 ```
 python3 flash_can.py -i can0 -u d0548cb2fa73 -f ~/firmware/octopus_1.1_klipper.bin
 ```
@@ -372,7 +372,7 @@ ll /dev/serial/by-id
 
 > Flash klipper to the board over serial usb
 ```
-python3 flash_can.py -d /dev/serial/by-id/usb-CanBoot_stm32f446xx_4A0021000651303431333234-if00 -f ~/firmware/octopus_1.1_klipper.bin
+python3 flash_can.py -d /dev/serial/by-id/usb-katapult_stm32f446xx_4A0021000651303431333234-if00 -f ~/firmware/octopus_1.1_klipper.bin
 ```
 
 Your board is now updated. You can restart everything.
